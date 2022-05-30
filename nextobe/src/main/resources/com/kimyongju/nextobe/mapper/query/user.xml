@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kimyongju.nextobe.user.dao.UserDAO">
+	<select id="signIn" resultType="userVO">
+		select * from vam_user where userid = #{userid} and userpwd = #{userpwd}
+	</select>
+	<select id="idOrNicknameCheck" parameterType="String" resultType="userVO">
+		select * from vam_user
+			<where>
+				<if test="userid != null">
+					 userid = #{userid}
+				</if>
+				<if test="nickname != null">
+					 nickname = #{nickname}
+				</if>
+			</where>
+	</select>
+	<insert id="signUp">
+		insert into vam_user values(UNO_SEQ.nextval, #{userid}, #{userpwd}, #{nickname}, #{username}
+		<if test="gender != null">
+			, #{gender}
+		</if>
+		<if test="userphone != null">
+			,#{userphone}
+		</if>
+		, 1, sysdate)
+	</insert>
+</mapper>
