@@ -94,9 +94,7 @@ textarea {
 		});
 		
 		$("#cancel_btn").on("click", function() {
-			moveForm.attr("action", "./boardList");
-			moveForm.attr("method", "get");
-			moveForm.submit();
+			history.go(-1);
 		});
 
 	</script>

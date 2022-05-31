@@ -86,6 +86,7 @@ textarea {
 		let result = '<c:out value="${result}"/>';
 		checkAlert(result);
         if (${userInfo.nickname ne boardInfo.writer}) {
+        	alert(${userInfo.nickname});
         	alert("잘못된 접근입니다.");
         	history.go(-1);
 		}

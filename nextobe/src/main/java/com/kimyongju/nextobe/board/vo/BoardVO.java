@@ -10,7 +10,8 @@ public class BoardVO {
 	private String content;
 	private String writer;
 	private String regdate;
-	private String update;
+	private String updatedate
+	;
 	
 	
 	

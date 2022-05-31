@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.kimyongju.nextobe.board.dao.BoardDAO;
 import com.kimyongju.nextobe.board.vo.BoardVO;
 import com.kimyongju.nextobe.board.vo.Criteria;
+import com.kimyongju.nextobe.board.vo.FileVO;
 
 @Service
 public class BoardServiceImpl implements BoardService {
@@ -23,5 +24,20 @@ public class BoardServiceImpl implements BoardService {
 	@Override
 	public int getTotal() {
 		return bdao.getTotal();
+	}
+
+	@Override
+	public BoardVO boardInfo(int bno) {
+		return bdao.boardInfo(bno);
+	}
+
+	@Override
+	public List<FileVO> fileInfo(int bno) {
+		return bdao.fileInfo(bno);
+	}
+
+	@Override
+	public int boardModify(BoardVO board) {
+		return bdao.boardModify(board);
 	}
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.kimyongju.nextobe.board.vo.BoardVO;
 import com.kimyongju.nextobe.board.vo.Criteria;
+import com.kimyongju.nextobe.board.vo.FileVO;
 
 @Repository
 public class BoardDAOImpl implements BoardDAO {
@@ -23,5 +24,20 @@ public class BoardDAOImpl implements BoardDAO {
 	@Override
 	public int getTotal() {
 		return session.selectOne("getTotal");
+	}
+
+	@Override
+	public BoardVO boardInfo(int bno) {
+		return session.selectOne("getBoardInfo", bno);
+	}
+
+	@Override
+	public List<FileVO> fileInfo(int bno) {
+		return session.selectList("fileInfo", bno);
+	}
+
+	@Override
+	public int boardModify(BoardVO board) {
+		return session.update("boardModify", board);
 	}
 }
