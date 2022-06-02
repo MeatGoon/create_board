@@ -18,4 +18,12 @@ public interface BoardDAO {
 
 	int boardModify(BoardVO board);
 
+	int boardInsert(BoardVO boardVo);
+
+	int fileInsert(FileVO file);
+
+	FileVO downloadFileInfo(int fno);
+
+	int boardDelete(int bno);
+
 }

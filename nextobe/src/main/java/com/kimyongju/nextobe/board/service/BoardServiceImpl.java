@@ -40,4 +40,24 @@ public class BoardServiceImpl implements BoardService {
 	public int boardModify(BoardVO board) {
 		return bdao.boardModify(board);
 	}
+
+	@Override
+	public int boardInsert(BoardVO boardVo) {
+		return bdao.boardInsert(boardVo);
+	}
+
+	@Override
+	public int fileInsert(FileVO file) {
+		return bdao.fileInsert(file);
+	}
+
+	@Override
+	public FileVO downloadFileInfo(int fno) {
+		return bdao.downloadFileInfo(fno);
+	}
+
+	@Override
+	public int boardDelete(int bno) {
+		return bdao.boardDelete(bno);
+	}
 }

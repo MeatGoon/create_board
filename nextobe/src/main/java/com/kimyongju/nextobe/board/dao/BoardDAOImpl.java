@@ -40,4 +40,24 @@ public class BoardDAOImpl implements BoardDAO {
 	public int boardModify(BoardVO board) {
 		return session.update("boardModify", board);
 	}
+
+	@Override
+	public int boardInsert(BoardVO boardVo) {
+		return session.insert("boardInsert", boardVo);
+	}
+
+	@Override
+	public int fileInsert(FileVO file) {
+		return session.insert("fileInsert", file);
+	}
+
+	@Override
+	public FileVO downloadFileInfo(int fno) {
+		return session.selectOne("downloadFileInfo", fno);
+	}
+
+	@Override
+	public int boardDelete(int bno) {
+		return session.delete("boardDelete", bno);
+	}
 }

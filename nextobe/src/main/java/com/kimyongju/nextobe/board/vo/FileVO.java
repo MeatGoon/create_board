@@ -8,7 +8,7 @@ public class FileVO {
 	private int bno;
 	private String org_file_name;
 	private String save_file_name;
-	private int file_size;
+	private Long file_size;
 	
 	
 	/* VAM_FILE
