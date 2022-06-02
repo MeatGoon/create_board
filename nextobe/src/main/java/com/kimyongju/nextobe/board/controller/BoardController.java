@@ -175,24 +175,25 @@ public class BoardController {
 		Row row = null;
 		Cell cell = null;
 		int rowNum = 0;
+		int checkLen = 0;
 		String[] header = {"게시판 제목", "게시판 내용", "게시판 작성자", "작성일", "업로드 파일 갯수", "파일 총 크기"};
 
-		for (int i = 0; i < checkedData.length; i++) {
-			row = sheet.createRow(rowNum++);
-		    cell = row.createCell(i);
-			cell.setCellValue(header[i]);
+		row = sheet.createRow(rowNum++);
+		for (int i = 0; i < header.length; i++) {
+            cell = row.createCell(i);
+            cell.setCellValue(header[i]);
 		}
 		for (int i = 0; i < checkedData.length; i++) {
 			row = sheet.createRow(rowNum++);
-			cell.setCellValue(i);
-			cell = row.createCell(1);
-			cell.setCellValue(i + "_name");
-			cell = row.createCell(2);
-			cell.setCellValue(i + "_title");
+            cell = row.createCell(0);
+            cell.setCellValue(i);
+            cell = row.createCell(1);
+            cell.setCellValue(i+"_name");
+            cell = row.createCell(2);
+            cell.setCellValue(i+"_title");
 		}
 
-		// 컨텐츠 타입과 파일명 지정 response.setContentType("ms-vnd/excel"); //
-		response.setHeader("Content-Disposition", "attachment;filename=example.xls");
+		response.setContentType("ms-vnd/excel");
 		response.setHeader("Content-Disposition", "attachment;filename=example.xlsx");
 
 		wb.write(response.getOutputStream());
