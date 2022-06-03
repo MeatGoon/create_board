@@ -29,9 +29,28 @@
     <select id="fileInfo" resultType="fileVO">
     	SELECT fno, bno, org_file_name, save_file_name, round(file_size / 1024, 1) as file_size FROM vam_file where bno = #{bno}
     </select>
+
+    <!-- <insert id="fileInsert">
+    	insert into vam_file values(FNO_SEQ.nextval, bno_seq.currval, #{org_file_name}, #{save_file_name}, #{file_size});
+    </insert> -->
+    
     <insert id="fileInsert">
-    	insert into vam_file values(FNO_SEQ.nextval, bno_seq.currval, #{org_file_name}, #{save_file_name}, #{file_size})
+    	EXEC fileInsert(#{org_file_name}, #{save_file_name}, #{file_size})
     </insert>
+
+<!-- CREATE OR REPLACE PROCEDURE fileInsert
+(
+    f_org_file_name IN VARCHAR2,
+    f_save_file_name IN VARCHAR2,
+    f_file_size IN NUMBER
+)
+is
+begin
+    INSERT INTO vam_file (fno, bno, org_file_name, save_file_name, file_size)
+    VALUES (FNO_SEQ.nextval, bno_seq.currval, f_org_file_name, f_save_file_name, f_file_size);
+    commit;
+end fileInsert; -->
+
     <select id="downloadFileInfo" resultType="fileVO">
     	select * from vam_file where fno = #{fno}
     </select>
