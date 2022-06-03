@@ -127,6 +127,7 @@ a:hover {color:black; text-decoration: underline;}
 		</div>
 	</div>
 	<form id="moveForm" method="get">
+		<input type="hidden" name="checkedData">
 		<input type="hidden" name="pageNum" value="${pageMaker.cri.pageNum }">
 		<input type="hidden" name="amount" value="${pageMaker.cri.amount }">   
 	</form>
@@ -151,25 +152,37 @@ a:hover {color:black; text-decoration: underline;}
 	        }
 	    }
 		$("#excelFileExport").on("click", function() {
-			if (saveExcel != false) {
-				var checkedData = new Array();
-				$('input:checkbox[id=excelChek]:checked').each(function() {
-					checkedData.push($(this).val());
-					console.log(checkedData);
-					});
-				$.ajax({
-					url : "/board/excelDownload",
-					type : "post",
-					traditional : true,
-					data : {checkedData},
-					success : function(result) {
-						alert("전송성공");
+			if (${userInfo ne null}) {
+				if (saveExcel != false) {
+					var checkedData = new Array();
+					$('input:checkbox[id=excelChek]:checked').each(function() {
+						checkedData.push($(this).val());
+						console.log(checkedData);
+						});
+					if (checkedData.length != 0) {
+						moveForm.find("input[name='checkedData']").val(checkedData);
+						moveForm.attr("action", "./excelDownload");
+						moveForm.attr("method", "post");
+						moveForm.submit();
+					} else {
+						alert("다운 받을 게시물을 클릭해주세요.")
 					}
-		    	});
-			} else {
-				$(".hidden_btn").show();	
-				saveExcel = true;
+					
+				} else {
+					$(".hidden_btn").show();	
+					saveExcel = true;
+				}
+			} else{
+				var conResult = confirm("로그인 먼저 해주시기 바합니다.");
+				if (conResult) {
+					moveForm.attr("action", "/user/signIn");
+					moveForm.attr("method", "get");
+					moveForm.submit();
+				} else {
+					return;
+				}
 			}
+			
 		});
 	});
 	

@@ -6,7 +6,9 @@ import java.net.URLEncoder;
 import java.util.List;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -52,24 +54,33 @@ public class BoardController {
 	}
 
 	@GetMapping("/boardInfo")
-	public void BoardInfo(Model model, Criteria cri, int bno) {
-		log.info("BoardInfo 페이지 이동");
-		model.addAttribute("boardInfo", bservice.boardInfo(bno));
-		model.addAttribute("cri", cri);
-		List<FileVO> fileInfo = bservice.fileInfo(bno);
-		if (!fileInfo.isEmpty()) {
-			model.addAttribute("fileInfo", fileInfo);
+	public void BoardInfo(Model model, Criteria cri, int bno, HttpSession session) {
+		if (session.getAttribute("userInfo") != null) {
+			log.info("BoardInfo 페이지 이동");
+			model.addAttribute("boardInfo", bservice.boardInfo(bno));
+			model.addAttribute("cri", cri);
+			List<FileVO> fileInfo = bservice.fileInfo(bno);
+			if (!fileInfo.isEmpty()) {
+				model.addAttribute("fileInfo", fileInfo);
+			}
+		}else {
+			model.addAttribute("result", "login first");
 		}
+		
 	}
 
 	@GetMapping("/boardModify")
-	public void boardModify(Model model, Criteria cri, int bno) {
-		log.info("boardModify 페이지 이동");
-		model.addAttribute("boardInfo", bservice.boardInfo(bno));
-		model.addAttribute("cri", cri);
-		List<FileVO> fileInfo = bservice.fileInfo(bno);
-		if (!fileInfo.isEmpty()) {
-			model.addAttribute("fileInfo", fileInfo);
+	public void boardModify(Model model, Criteria cri, int bno, HttpSession session) {
+		if (session.getAttribute("userInfo") != null) {
+			log.info("boardModify 페이지 이동");
+			model.addAttribute("boardInfo", bservice.boardInfo(bno));
+			model.addAttribute("cri", cri);
+			List<FileVO> fileInfo = bservice.fileInfo(bno);
+			if (!fileInfo.isEmpty()) {
+				model.addAttribute("fileInfo", fileInfo);
+			}
+		}else {
+			model.addAttribute("result", "login first");
 		}
 	}
 
@@ -87,8 +98,13 @@ public class BoardController {
 	}
 
 	@GetMapping("/boardInsert")
-	public void boardInsert() {
-		log.info("boardInsert 페이지 이동");
+	public void boardInsert(HttpSession session, Model model) {
+		if (session.getAttribute("userInfo") != null) {
+			log.info("boardInsert 페이지 이동");
+		
+		}else {
+			model.addAttribute("result", "login first");
+		}
 	}
 
 	@PostMapping("/boardDelete")
@@ -144,60 +160,90 @@ public class BoardController {
 	}
 
 	@GetMapping("/fileDownload")
-	public void fileDownload(int fno, HttpServletResponse response) throws IOException {
-		String upPath = "D:\\workspace\\upload\\";
-		FileVO file = bservice.downloadFileInfo(fno);
-
-		String saveFileName = file.getSave_file_name();
-		String originalFileName = file.getOrg_file_name();
-
-		File downloadFile = new File(upPath + saveFileName);
-
-		byte fileByte[] = FileUtils.readFileToByteArray(downloadFile);
-
-		response.setContentType("application/octet-stream");
-		response.setContentLength(fileByte.length);
-
-		response.setHeader("Content-Disposition",
-				"attachment; fileName=\"" + URLEncoder.encode(originalFileName, "UTF-8") + "\";");
-		response.setHeader("Content-Transfer-Encoding", "binary");
-
-		response.getOutputStream().write(fileByte);
-		response.getOutputStream().flush();
-		response.getOutputStream().close();
-
+	public void fileDownload(int fno, HttpServletResponse response, HttpSession session, Model model) throws IOException {
+		if (session.getAttribute("userInfo") != null) {
+			String upPath = "D:\\workspace\\upload\\";
+			FileVO file = bservice.downloadFileInfo(fno);
+	
+			String saveFileName = file.getSave_file_name();
+			String originalFileName = file.getOrg_file_name();
+	
+			File downloadFile = new File(upPath + saveFileName);
+	
+			byte fileByte[] = FileUtils.readFileToByteArray(downloadFile);
+	
+			response.setContentType("application/octet-stream");
+			response.setContentLength(fileByte.length);
+	
+			response.setHeader("Content-Disposition",
+					"attachment; fileName=\"" + URLEncoder.encode(originalFileName, "UTF-8") + "\";");
+			response.setHeader("Content-Transfer-Encoding", "binary");
+	
+			response.getOutputStream().write(fileByte);
+			response.getOutputStream().flush();
+			response.getOutputStream().close();
+		}else {
+			model.addAttribute("result", "login first");
+		}
 	}
 
 	@PostMapping("/excelDownload")
-	public void excelDownload(HttpServletResponse response, String[] checkedData) throws IOException {
+	public void excelDownload(HttpServletResponse response, int[] checkedData, HttpSession session) throws Exception {
 		Workbook wb = new XSSFWorkbook();
 		Sheet sheet = wb.createSheet("첫번째 시트");
 		Row row = null;
 		Cell cell = null;
 		int rowNum = 0;
-		int checkLen = 0;
-		String[] header = {"게시판 제목", "게시판 내용", "게시판 작성자", "작성일", "업로드 파일 갯수", "파일 총 크기"};
+		int forNum = 0;
+		int fileSize = 0;
+		String[] headerName = { "게시판 제목", "게시판 내용", "게시판 작성자", "작성일", "업로드 파일 갯수", "업로드 파일 총 용량" };
 
+		// 헤더 세팅
 		row = sheet.createRow(rowNum++);
-		for (int i = 0; i < header.length; i++) {
-            cell = row.createCell(i);
-            cell.setCellValue(header[i]);
-		}
-		for (int i = 0; i < checkedData.length; i++) {
-			row = sheet.createRow(rowNum++);
-            cell = row.createCell(0);
-            cell.setCellValue(i);
-            cell = row.createCell(1);
-            cell.setCellValue(i+"_name");
-            cell = row.createCell(2);
-            cell.setCellValue(i+"_title");
+		for (int i = 0; i < headerName.length; i++) {
+			cell = row.createCell(i);
+			cell.setCellValue(headerName[i]);
 		}
 
+		// 바디 세팅 (게시판 정보)
+		for (int i = 0; i < checkedData.length; i++) {
+		 	BoardVO board = bservice.boardInfo(checkedData[i]);
+		 	forNum = 0;
+			row = sheet.createRow(rowNum++);
+			cell = row.createCell(forNum++);
+			cell.setCellValue(board.getTitle());
+			cell = row.createCell(forNum++);
+			cell.setCellValue(board.getContent());
+			cell = row.createCell(forNum++);
+			cell.setCellValue(board.getWriter());
+			cell = row.createCell(forNum++);
+			cell.setCellValue(board.getRegdate());
+			cell = row.createCell(forNum++);
+			System.out.println("forNum 중간 확인 : " + forNum);
+			
+			List<FileVO> file = bservice.fileInfo(checkedData[i]);
+			if (!file.isEmpty()) {
+				cell.setCellValue(file.size() + "개");
+				cell = row.createCell(forNum++);
+				for (int k = 0; k < file.size(); k++) {
+					fileSize += file.get(k).getFile_size();
+				}
+				cell.setCellValue(fileSize + "kb");
+				
+			}
+		
+		
+		}
+		
+
+		// 컨텐츠 타입과 파일명 지정
 		response.setContentType("ms-vnd/excel");
 		response.setHeader("Content-Disposition", "attachment;filename=example.xlsx");
 
+		// Excel File Output
 		wb.write(response.getOutputStream());
 		wb.close();
+		System.out.println("실행완료");
 	}
 
 }

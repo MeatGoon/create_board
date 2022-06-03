@@ -85,7 +85,6 @@ textarea {
 	<input type="hidden" name="bno" value="${boardInfo.bno}"/>
 	<input type="hidden" name="pageNum" value='<c:out value="${cri.pageNum}"></c:out>' />
 	<input type="hidden" name="amount" value='<c:out value="${cri.amount}"></c:out>' />
-	${sessionScope.userid}
 </form>
 <script>
 	let moveForm = $("#moveForm");
@@ -113,6 +112,10 @@ textarea {
 	        if(result === "boardModify success"){
 	            alert("수정이 완료되었습니다.");
 	        }
+	        if (result === "worng way") {
+				alert("잘못된 접근입니다");
+				history.go(-1);
+			}
 	    } 
 	});
 	
